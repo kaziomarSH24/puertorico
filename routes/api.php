@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,11 @@ Route::controller(AuthController::class)->group(function(){
 
     //social login
     Route::post('/auth/social-login', 'socialLogin');
+});
+
+//Admin routes
+Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth','check.admin']], function () {
+    //category controller
+    Route::apiResource('category', CategoryController::class)->except(['create', 'edit']);
+
 });

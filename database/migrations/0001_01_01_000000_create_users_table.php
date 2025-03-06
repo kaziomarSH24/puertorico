@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('avatar')->nullable();
             $table->string('phone')->nullable();
+            $table->enum('role', ['user', 'admin','super-admin'])->default('user');
             $table->string('otp')->nullable();
             $table->timestamp('otp_expire_at')->nullable();
             $table->string('password');
