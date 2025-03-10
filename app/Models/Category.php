@@ -8,6 +8,12 @@ class Category extends Model
 {
     protected $guarded = ['id'];
 
+    //category audios
+    public function audios()
+    {
+        return $this->hasMany(Audio::class, 'category_id', 'id');
+    }
+
     //category image attribute
     public function getCategoryImageAttribute($value)
     {

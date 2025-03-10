@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Homecontroller;
 use App\Http\Controllers\NearbyAudioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,4 +44,8 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post('find-nearby-audio', [NearbyAudioController::class, 'checkNearbyAudios']);
     Route::post('get-nearby-audio', [NearbyAudioController::class, 'getNearbyAudios']);
     Route::get('audio/{id}', [AudioController::class, 'show']);
+
+    //homesection
+    Route::get('home-section', [Homecontroller::class, 'homeSection']);
+    Route::get('category/{id}/audio', [Homecontroller::class, 'categoryAudios']);
 });

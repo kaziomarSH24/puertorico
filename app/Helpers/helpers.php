@@ -3,7 +3,7 @@
 use App\Mail\OTP;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-
+use getID3\getID3;
 if(!function_exists('sentOTP')){
     function sentOTP(array $data, $otp_expire_time){
         $otp = generateOtp(4);
@@ -54,3 +54,29 @@ if (!function_exists('generateUniqueSlug')) {
         return $slug;
     }
 }
+
+if (!function_exists('getStorageFilePath')) {
+    function getStorageFilePath($url)
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        return str_replace('/storage/', '', $path);
+    }
+}
+
+
+//get audio duration
+if (!function_exists('getAudioDuration')) {
+    function getAudioDuration($filePath)
+    {
+        $getID3 = new \getID3;
+        $filePath = storage_path('app/public/' . $filePath);
+        $file = $getID3->analyze($filePath);
+        // return $file['playtime_string'];
+        if (isset($file['playtime_string'])) {
+            return $file['playtime_string'];
+        } else {
+            return "Duration not available";
+        }
+    }
+}
+
