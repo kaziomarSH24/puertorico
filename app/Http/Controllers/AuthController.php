@@ -54,6 +54,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
+            'otp' => $data['otp'],
             'message' => 'User created successfully! Please check your email for OTP!',
         ]);
     }
@@ -193,6 +194,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
+                'otp' => $data['otp'],
                 'message' => 'OTP sent successfully! Please check your email!',
             ]);
         } else {

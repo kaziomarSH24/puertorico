@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Mail;
 
 if(!function_exists('sentOTP')){
     function sentOTP(array $data, $otp_expire_time){
-        $otp = generateOtp();
+        $otp = generateOtp(4);
         $otp_expire_at = Carbon::now()->addMinutes($otp_expire_time)->format('Y-m-d H:i:s');
         $data = [
             'name' => $data['name'],
