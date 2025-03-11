@@ -40,6 +40,7 @@ class AudioController extends Controller
 
         $audios = $query->paginate($request->input('per_page', 10));
 
+
         if ($audios->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -69,8 +70,9 @@ class AudioController extends Controller
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
-            'audio_file' => 'required|file|mimes:mp3,wav,ogg,aac,flac,m4a,amr,opus',
-            'audio_image' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'url' => 'required|file|mimes:mp3,wav,ogg,aac,flac,m4a,amr,opus',
+            'artist' => 'nullable|string|max:255',
+            'artwork' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'language' => 'required|in:english,spanish',
             'description' => 'nullable|string',
             'lat' => 'required|numeric',
@@ -85,12 +87,12 @@ class AudioController extends Controller
         }
 
         //has audio file
-        $audioFile = $request->file('audio_file');
+        $audioFile = $request->file('url');
         if($audioFile){
             $audioFilePath = $audioFile->store('audio', 'public');
         }
         //has image file
-        $audioImage = $request->file('audio_image');
+        $audioImage = $request->file('artwork');
         if($audioImage){
             $audioImgPath = $audioImage->store('audio/image', 'public');
         }
@@ -98,8 +100,9 @@ class AudioController extends Controller
         $audio = new Audio();
         $audio->category_id = $request->category_id;
         $audio->title = $request->title;
-        $audio->audio_file = $audioFilePath;
-        $audio->audio_image = $audioImgPath;
+        $audio->url = $audioFilePath;
+        $audio->artist = $request->artist;
+        $audio->artwork = $audioImgPath;
         $audio->language = $request->language;
         $audio->description = $request->description;
         $audio->lat = $request->lat;
@@ -133,7 +136,11 @@ class AudioController extends Controller
             $audio->views = $audio->views + 1;
             $audio->save();
         }
-        $audio->save();
+        // $audio->save();
+        $audioFilePath = getStorageFilePath($audio->url);
+        $duration = getAudioDuration($audioFilePath);
+        // return $duration;
+        $audio->duration = $duration;
 
         return response()->json([
             'success' => true,
@@ -157,8 +164,9 @@ class AudioController extends Controller
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
-            'audio_file' => 'nullable|file',
-            'audio_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'url' => 'nullable|file',
+            'artist' => 'nullable|string|max:255',
+            'artwork' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'language' => 'required|in:english,spanish',
             'description' => 'nullable|string',
             'lat' => 'required|numeric',
@@ -181,9 +189,9 @@ class AudioController extends Controller
         }
 
         //has audio file
-        $audioFile = $request->file('audio_file');
+        $audioFile = $request->file('url');
         if($audioFile){
-            $audioPath = $audioPath = str_replace('/storage/', '', parse_url($audio->audio_file)['path']);
+            $audioPath = $audioPath = str_replace('/storage/', '', parse_url($audio->url)['path']);
             // return $audioPath;
             //delete old audio file
             if(Storage::disk('public')->exists($audioPath)){
@@ -191,17 +199,17 @@ class AudioController extends Controller
             }
 
             $audioFilePath = $audioFile->store('audio', 'public');
-            $audio->audio_file = $audioFilePath;
+            $audio->url = $audioFilePath;
         }
         //has image file
-        $audioImage = $request->file('audio_image');
+        $audioImage = $request->file('artwork');
         if($audioImage){
-            $ImgPath = str_replace('/storage/', '', parse_url($audio->audio_image)['path']);
+            $ImgPath = str_replace('/storage/', '', parse_url($audio->artwork)['path']);
             if(Storage::disk('public')->exists($ImgPath)){
                 Storage::disk('public')->delete($ImgPath);
             }
             $audioImgPath = $audioImage->store('audio/image', 'public');
-            $audio->audio_image = $audioImgPath;
+            $audio->artwork = $audioImgPath;
         }
 
         $audio->category_id = $request->category_id;
@@ -233,8 +241,8 @@ class AudioController extends Controller
             ], 404);
         }
         // return $audio;
-        $audioFilePath = str_replace('/storage/', '', parse_url($audio->audio_file)['path']);
-        $audioImgPath = str_replace('/storage/', '', parse_url($audio->audio_image)['path']);
+        $audioFilePath = str_replace('/storage/', '', parse_url($audio->url)['path']);
+        $audioImgPath = str_replace('/storage/', '', parse_url($audio->artwork)['path']);
 
         //delete audio file
         if(Storage::disk('public')->exists($audioFilePath)){

@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stories', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
+        Schema::table('categories', function (Blueprint $table) {
+            $table->boolean('is_featured')->default(false)->after('description');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stories');
+        Schema::table('categories', function (Blueprint $table) {
+            $table->dropColumn('is_featured');
+        });
     }
 };

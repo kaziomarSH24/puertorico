@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->string('title');
-            $table->string('audio_file');
-            $table->string('audio_image')->nullable();
+            $table->string('url');
+            $table->string('artist')->nullable();
+            $table->string('artwork')->nullable();
             $table->enum('language',['english','spanish']);
             $table->text('description')->nullable();
             $table->integer('views')->default(0);
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-    
+
     /**
      * Reverse the migrations.
      */

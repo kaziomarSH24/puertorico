@@ -14,13 +14,13 @@ class Audio extends Model
     }
 
     //audio file attribute
-    public function getAudioFileAttribute($value)
+    public function getUrlAttribute($value)
     {
         return $value ? asset('storage/' . $value) : null;
     }
 
     //audio image attribute
-    public function getAudioImageAttribute($value)
+    public function getArtworkAttribute($value)
     {
         return $value ? asset('storage/' . $value) : null;
     }

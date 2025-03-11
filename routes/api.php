@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Homecontroller;
 use App\Http\Controllers\NearbyAudioController;
+use App\Http\Controllers\StoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +20,7 @@ Route::controller(AuthController::class)->group(function(){
     Route::get('/logout', 'logout')->middleware('jwt.auth');
     Route::post('/verify-email', 'verifyEmail');
     Route::post('/resent-otp', 'resendOtp');
-    Route::post('reset-password', 'resetPassword');
+    Route::post('reset-password', 'resetPassword')->middleware('jwt.auth');
     Route::post('forgot-password', 'forgotPassword');
     Route::get('validate-token', 'validateToken')->middleware('jwt.auth');
     //update user profile & password
@@ -48,4 +49,7 @@ Route::middleware('jwt.auth')->group(function () {
     //homesection
     Route::get('home-section', [Homecontroller::class, 'homeSection']);
     Route::get('category/{id}/audio', [Homecontroller::class, 'categoryAudios']);
+
+    //story
+    Route::apiResource('story', StoryController::class)->except(['create', 'edit']);
 });
