@@ -4,6 +4,8 @@ use App\Mail\OTP;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use getID3\getID3;
+use Illuminate\Support\Facades\Auth;
+
 if(!function_exists('sentOTP')){
     function sentOTP(array $data, $otp_expire_time){
         $otp = generateOtp(4);
@@ -79,4 +81,6 @@ if (!function_exists('getAudioDuration')) {
         }
     }
 }
+
+
 

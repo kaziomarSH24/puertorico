@@ -35,6 +35,10 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'otp',
         'otp_expire_at',
+        'lat',
+        'lng',
+        'google_id',
+        'facebook_id',
         'email_verified_at',
         'remember_token',
     ];
@@ -66,5 +70,24 @@ class User extends Authenticatable implements JWTSubject
     public function stories()
     {
         return $this->hasMany(Story::class, 'user_id', 'id');
+    }
+
+    //user favorites
+    public function favorites()
+    {
+        return $this->belongsToMany(Audio::class, 'favorites', 'user_id', 'audio_id');
+    }
+
+    //user bookmarks
+
+    public function bookmarks()
+    {
+        return $this->belongsToMany(Audio::class, 'bookmarks', 'user_id', 'audio_id');
+    }
+
+    //avatar attribute
+    public function getAvatarAttribute($value)
+    {
+        return $value ? asset('storage/' . $value) : null;
     }
 }

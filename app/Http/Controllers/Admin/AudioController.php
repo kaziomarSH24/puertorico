@@ -191,7 +191,7 @@ class AudioController extends Controller
         //has audio file
         $audioFile = $request->file('url');
         if($audioFile){
-            $audioPath = $audioPath = str_replace('/storage/', '', parse_url($audio->url)['path']);
+            $audioPath = str_replace('/storage/', '', parse_url($audio->url)['path']);
             // return $audioPath;
             //delete old audio file
             if(Storage::disk('public')->exists($audioPath)){

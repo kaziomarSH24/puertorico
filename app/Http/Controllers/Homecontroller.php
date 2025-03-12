@@ -59,7 +59,7 @@ class Homecontroller extends Controller
             ->when($request->has('language'), function ($query) use ($request) {
                 $query->where('language', $request->language);
             })
-            ->select('id', 'title', 'url', 'category_id', 'views', 'language')
+            ->select('id', 'title', 'url', 'category_id', 'views', 'language', 'artist', 'artwork', 'is_favorite', 'is_bookmarked')
             ->paginate($request->per_page ?? 10);
 
         if ($audios->isEmpty()) {

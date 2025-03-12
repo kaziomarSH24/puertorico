@@ -16,7 +16,7 @@ class FavoriteController extends Controller
     {
         $user = Auth::user();
         $favorites = Favorite::with(['audio' => function ($query) {
-            $query->select(['id', 'title', 'url', 'artwork', 'category_id', 'views', 'language']);
+            $query->select(['id', 'title', 'url', 'artwork', 'category_id', 'views', 'language', 'artist', 'is_favorite', 'is_bookmarked']);
         }])
             ->where('user_id', $user->id)
             ->paginate($request->input('per_page', 10));
