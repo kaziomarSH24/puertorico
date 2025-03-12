@@ -27,6 +27,7 @@ class AuthController extends Controller
             'full_name' => 'required|string',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|confirmed|min:8',
+            'device_token' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -50,6 +51,7 @@ class AuthController extends Controller
         $user->password = $request->password;
         $user->otp = $data['otp'];
         $user->otp_expire_at = $data['otp_expire_at'];
+        $user->device_token = $request->device_token;
         $user->save();
 
         return response()->json([

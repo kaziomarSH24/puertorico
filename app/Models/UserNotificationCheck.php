@@ -16,6 +16,6 @@ class UserNotificationCheck extends Model
 
     public function audio()
     {
-        return $this->belongsTo(Audio::class);
+        return $this->belongsTo(Audio::class, 'audio_id');
     }
 }

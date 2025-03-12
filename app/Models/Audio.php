@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Audio extends Model
 {
     protected $guarded = ['id'];
+    
+    protected $table = 'audios';
 
     public function category()
     {

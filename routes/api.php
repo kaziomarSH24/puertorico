@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\Homecontroller;
 use App\Http\Controllers\NearbyAudioController;
 use App\Http\Controllers\StoryController;
@@ -51,5 +54,16 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('category/{id}/audio', [Homecontroller::class, 'categoryAudios']);
 
     //story
-    Route::apiResource('story', StoryController::class)->except(['create', 'edit']);
+    Route::apiResource('story', StoryController::class)->except(['create', 'edit','show','update']);
+    //favorite
+    Route::apiResource('favorite', FavoriteController::class)->except(['create', 'edit','show','update']);
+    //bookmark
+    Route::apiResource('bookmark', BookmarkController::class)->except(['create', 'edit','show','update']);
+});
+
+Route::group(['middleware' => 'jwt.auth', 'prefix' => 'notifications'], function () {
+    Route::get('/', [NotificationController::class, 'getNotifications']);
+    Route::put('/mark-as-read', [NotificationController::class, 'markAsRead']);
+    Route::put('/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/delete', [NotificationController::class, 'deleteNotification']);
 });

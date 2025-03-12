@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $guarded = ['id'];
-    protected $fillable = [
-        'category_name',
-        'slug',
-        'category_image',
-        'description'
-    ];
+    // protected $fillable = [
+    //     'category_name',
+    //     'slug',
+    //     'category_image',
+    //     'description'
+    // ];
 
     //category audios
     public function audios()

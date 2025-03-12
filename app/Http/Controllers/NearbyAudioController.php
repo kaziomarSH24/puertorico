@@ -7,6 +7,7 @@ use App\Models\UserNotificationCheck;
 use App\Notifications\NearbySongNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class NearbyAudioController extends Controller
@@ -14,6 +15,8 @@ class NearbyAudioController extends Controller
 
     public function checkNearbyAudios(Request $request)
     {
+        // Log::info('Check Nearby Audios');
+        log::info('++++++++++++++',$request->all());
         $validator = Validator::make($request->all(), [
             'lat'  => 'required|numeric',
             'lng' => 'required|numeric',
@@ -43,8 +46,13 @@ class NearbyAudioController extends Controller
 
         //send  notification
         $data = $this->findAudios($latitude, $longitude);
-        $newSongs = $data['new_songs'];
-
+        // return $data;
+        if ($data instanceof \Illuminate\Http\JsonResponse) {
+            return $data;
+        }
+        $newSongs = $data['new_songs'] ?? [];
+        Log::info(count($newSongs) > 0 ? 'Notification sent' : 'No new songs to notify++');
+        Log::info($nearbyAudios);
         return response()->json([
             'success' => true,
             'message' => count($newSongs) > 0 ? 'Notification sent' : 'No new songs to notify',
@@ -75,6 +83,10 @@ class NearbyAudioController extends Controller
 
         //Find Nearby Songs
         $data = $this->findAudios($latitude, $longitude, $request->language);
+        // dd($data);
+        if ($data instanceof \Illuminate\Http\JsonResponse) {
+            return $data;
+        }
         $newSongs = $data['new_songs'];
         $nearbySongs = $data['nearby_songs'];
 
@@ -104,7 +116,7 @@ class NearbyAudioController extends Controller
         // return $nearbySongs;
 
         if ($nearbySongs->isEmpty()) {
-            return response()->json(['success' => true, 'message' => 'No nearby songs found']);
+            return response()->json(['success' => false, 'message' => 'No nearby songs found']);
         }
 
        if($language === null){
