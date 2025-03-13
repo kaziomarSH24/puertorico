@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PricingPlanController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
@@ -43,6 +44,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth','check.admin']], 
     Route::apiResource('category', CategoryController::class)->except(['create', 'edit']);
     //audio controller
     Route::apiResource('audio', AudioController::class)->except(['create', 'edit']);
+
+    //pricingPlan controller
+    Route::get('pricing-plan', [PricingPlanController::class, 'getAllPlan']);
+    Route::post('pricing-plan/update', [PricingPlanController::class, 'updateOrCreatePlan']);
 
     //page controller
     Route::get('/pages/{type}', [PageController::class, 'getPageContent']);
