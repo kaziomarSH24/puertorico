@@ -36,8 +36,8 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'category_name' => 'required|string|max:255',
-            'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'title' => 'required|string|max:255',
+            'artwork' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string'
         ]);
 
@@ -49,15 +49,15 @@ class CategoryController extends Controller
         }
 
         //has image file
-        $categoryImage = $request->file('category_image');
+        $categoryImage = $request->file('artwork');
         if($categoryImage){
             $catImgPath = $categoryImage->store('category', 'public');
         }
 
         $category = new Category();
-        $category->category_name = $request->category_name;
-        $category->slug = generateUniqueSlug($category, $request->category_name);
-        $category->category_image = $catImgPath;
+        $category->title = $request->title;
+        // $category->slug = generateUniqueSlug($category, $request->title);
+        $category->artwork = $catImgPath;
         $category->description = $request->description;
 
         if($category->save()){
@@ -108,8 +108,8 @@ class CategoryController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'category_name' => 'required|string|max:255',
-            'category_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'title' => 'required|string|max:255',
+            'artwork' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string'
         ]);
 
@@ -130,19 +130,19 @@ class CategoryController extends Controller
         }
 
         //has image file
-        $categoryImage = $request->file('category_image');
+        $categoryImage = $request->file('artwork');
         if($categoryImage){
             //delete old image
-            $oldImagePath = str_replace('/storage/', '', parse_url($categories->category_image, PHP_URL_PATH));
+            $oldImagePath = str_replace('/storage/', '', parse_url($categories->artwork, PHP_URL_PATH));
             if(Storage::disk('public')->exists($oldImagePath)){
                 Storage::disk('public')->delete($oldImagePath);
             }
             $catImgPath = $categoryImage->store('category', 'public');
         }
 
-        $categories->category_name = $request->category_name;
-        $categories->slug = generateUniqueSlug($categories, $request->category_name);
-        $categories->category_image = $catImgPath;
+        $categories->title = $request->title;
+        // $categories->slug = generateUniqueSlug($categories, $request->title);
+        $categories->artwork = $catImgPath;
         $categories->description = $request->description;
 
         $categories->save();
@@ -167,7 +167,7 @@ class CategoryController extends Controller
             ], 404);
         }
         //delete category image
-        $catImgPath = str_replace('/storage/', '', parse_url($category->category_image, PHP_URL_PATH));
+        $catImgPath = str_replace('/storage/', '', parse_url($category->artwork, PHP_URL_PATH));
         // return $catImgPath;
         if(Storage::disk('public')->exists($catImgPath)){
             Storage::disk('public')->delete($catImgPath);

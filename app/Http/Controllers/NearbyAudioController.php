@@ -98,7 +98,7 @@ class NearbyAudioController extends Controller
 
     private function findAudios($latitude, $longitude, $language = null){
         $user = Auth::user();
-         $query = Audio::select('id', 'title', 'lat', 'lng', 'category_id', 'language', 'url','artist', 'artwork', 'views', 'is_favorite', 'is_bookmarked')
+         $query = Audio::select('id', 'title', 'lat', 'lng', 'category_id', 'language', 'url','artist', 'artwork', 'views')
             ->selectRaw("
             (6371 * acos(
             cos(radians(?)) * cos(radians(lat)) * cos(radians(lng) - radians(?)) +

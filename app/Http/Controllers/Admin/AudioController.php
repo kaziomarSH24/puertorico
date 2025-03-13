@@ -17,7 +17,7 @@ class AudioController extends Controller
     public function index(Request $request)
     {
         $query = Audio::query()->with(['category' => function ($query) {
-            $query->select('id', 'category_name', 'category_image');
+            $query->select('id', 'title', 'artwork');
         }]);
 
         if ($request->has('category_id')) {
@@ -122,7 +122,7 @@ class AudioController extends Controller
     public function show(string $id)
     {
         $audio = Audio::with(['category' => function ($query) {
-            $query->select('id', 'category_name', 'category_image');
+            $query->select('id', 'title', 'artwork');
         }])->find($id);
         if(!$audio){
             return response()->json([

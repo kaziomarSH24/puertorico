@@ -8,9 +8,9 @@ class Category extends Model
 {
     protected $guarded = ['id'];
     // protected $fillable = [
-    //     'category_name',
+    //     'title',
     //     'slug',
-    //     'category_image',
+    //     'artwork',
     //     'description'
     // ];
 
@@ -26,7 +26,7 @@ class Category extends Model
     }
 
     //category image attribute
-    public function getCategoryImageAttribute($value)
+    public function getArtworkAttribute($value)
     {
         return $value ? asset('storage/' . $value) : null;
     }

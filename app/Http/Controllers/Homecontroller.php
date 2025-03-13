@@ -14,7 +14,7 @@ class Homecontroller extends Controller
     public function homeSection()
     {
         $featuredCategory = Category::where('is_featured', 1)
-            // ->select('id','category_name', 'category_image')
+            // ->select('id','title', 'artwork')
             ->paginate(10);
 
         // $topAudios = Audio::whereIn('category_id', $topCategory)
@@ -59,7 +59,7 @@ class Homecontroller extends Controller
             ->when($request->has('language'), function ($query) use ($request) {
                 $query->where('language', $request->language);
             })
-            ->select('id', 'title', 'url', 'category_id', 'views', 'language', 'artist', 'artwork', 'is_favorite', 'is_bookmarked')
+            ->select('id', 'title', 'url', 'category_id', 'views', 'language', 'artist', 'artwork')
             ->paginate($request->per_page ?? 10);
 
         if ($audios->isEmpty()) {
@@ -93,8 +93,8 @@ class Homecontroller extends Controller
         $audios = [
             'category' => [
                 'id' => $category->id,
-                'category_name' => $category->category_name,
-                'category_image' => $category->category_image,
+                'title' => $category->title,
+                'artwork' => $category->artwork,
                 'description' => $category->description,
                 'has_story' => $hasStory,
                 'total_duration' => $totalDuration,

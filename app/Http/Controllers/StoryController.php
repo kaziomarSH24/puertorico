@@ -16,7 +16,7 @@ class StoryController extends Controller
     {
         $user = Auth::user();
         $stories = Story::with(['category' => function ($query) {
-            $query->select(['id', 'category_name', 'category_image']);
+            $query->select(['id', 'title', 'artwork']);
         }])
             ->where('user_id', $user->id)
             ->paginate($request->input('per_page', 10));
@@ -32,8 +32,8 @@ class StoryController extends Controller
             return [
                 'id'=> $story->id,
                 'category_id' => $story->category->id,
-                'category_name' => $story->category->category_name,
-                'category_image' => $story->category->category_image,
+                'title' => $story->category->title,
+                'artwork' => $story->category->artwork,
             ];
         });
 
@@ -98,7 +98,7 @@ class StoryController extends Controller
      */
     public function show(string $id)
     {
-        
+
     }
 
     /**
