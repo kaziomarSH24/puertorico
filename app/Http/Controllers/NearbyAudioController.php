@@ -116,7 +116,7 @@ class NearbyAudioController extends Controller
         // return $nearbySongs;
 
         if ($nearbySongs->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'No nearby songs found']);
+            return response()->json(['success' => false, 'message' => 'No nearby songs foundsss'], 404);
         }
 
        if($language === null){
@@ -124,10 +124,10 @@ class NearbyAudioController extends Controller
         foreach ($nearbySongs as $song) {
             $alreadyNotified = UserNotificationCheck::where('user_id', $user->id)
                 ->where('audio_id', $song->id)
-                ->where('notified_at', '>=', now()->subHours(6)) // Notify after 6 hours
+                ->where('notified_at', '>=', now()->subSeconds(2)) // Notify after 1 second
                 ->exists();
-
-            if (!$alreadyNotified) {
+            // return $alreadyNotified;
+            if (!$alreadyNotified || $alreadyNotified) {
                 $newSongs[] = $song;
 
                 // Store Notification Log

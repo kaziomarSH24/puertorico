@@ -12,6 +12,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\Homecontroller;
 use App\Http\Controllers\NearbyAudioController;
 use App\Http\Controllers\StoryController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,9 @@ Route::middleware('jwt.auth')->group(function () {
     //update user profile & password
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/update-password', [UserController::class, 'updatePassword']);
+
+    //subscription
+    Route::post('create-checkout-session', [SubscriptionController::class, 'createCheckoutSession']);
 });
 
 //notification
@@ -92,3 +96,10 @@ Route::group(['middleware' => 'jwt.auth', 'prefix' => 'notifications'], function
     Route::put('/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/delete', [NotificationController::class, 'deleteNotification']);
 });
+
+// Route::post('create-payment', [SubscriptionController::class, 'createPayment']);
+
+
+//payment callback
+Route::get('stripe-payment-success', [SubscriptionController::class, 'paymentSuccess'])->name('payment.verify');
+Route::get('stripe-payment-cancel', [SubscriptionController::class, 'paymentCancel'])->name('payment.cancel');

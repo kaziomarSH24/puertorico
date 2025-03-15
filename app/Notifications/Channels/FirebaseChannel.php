@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Channels;
 
+use GPBMetadata\Google\Api\Log;
 use Illuminate\Notifications\Notification;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Exception\MessagingException;
@@ -17,8 +18,10 @@ class FirebaseChannel
         }
 
         try{
+            $serviceAccountPath = storage_path('puertorico-push-notificaton-firebase-adminsdk-fbsvc-f0bd2f48d4.json');
+            \Log::info('serviceAccountPath: ' . $serviceAccountPath);
             $messaging = (new Factory)
-            ->withServiceAccount(env('FIREBASE_CREDENTIALS'))
+            ->withServiceAccount($serviceAccountPath)
             ->createMessaging();
 
         // if (!method_exists($notification, 'toFirebase')) {
@@ -32,7 +35,9 @@ class FirebaseChannel
                 'body'  => $fcmData['body'],
             ])
             ->withData($fcmData['data'] ?? []);
+            \Log::info("User Device Token: " . $fcmData['token']);
 
+                // dd($message);
         return $messaging->send($message);
         } catch (MessagingException | FirebaseException $e) {
             // Log the error or handle it as needed

@@ -69,6 +69,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|',
             'password' => 'required|string|min:8',
+            // 'device_token' => 'nullable|string',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -91,6 +92,9 @@ class AuthController extends Controller
                 ]);
             }
         }
+
+        $user->device_token = $request->device_token;
+        $user->save();
 
         return $this->responseWithToken($token);
     }
