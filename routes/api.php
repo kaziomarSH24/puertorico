@@ -2,10 +2,14 @@
 
 use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\FeaturedController;
+use App\Http\Controllers\Admin\ManageUser;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PricingPlanController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\AudioTrackController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\FavoriteController;
@@ -41,13 +45,15 @@ Route::controller(AuthController::class)->group(function(){
 
 //Admin routes
 Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth','check.admin']], function () {
+    //dashboard
+    Route::get('/dashboard', [DashboardController::class, 'dashboard']);
     //category controller
     Route::apiResource('category', CategoryController::class)->except(['create', 'edit']);
     //audio controller
     Route::apiResource('audio', AudioController::class)->except(['create', 'edit']);
 
     //pricingPlan controller
-    Route::get('pricing-plan', [PricingPlanController::class, 'getAllPlan']);
+    Route::get('pricing-plan', [PricingPlanController::class, 'getAllPlan'])->withoutMiddleware('check.admin');
     Route::post('pricing-plan/update', [PricingPlanController::class, 'updateOrCreatePlan']);
 
     //page controller
@@ -55,6 +61,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.auth','check.admin']], 
     Route::post('/pages/update', [PageController::class, 'updateOrCreatePage']);
     //faq controller
     Route::apiResource('faq', FaqController::class)->except(['create', 'edit','show']);
+
+    //manage user
+    Route::get('/user', [ManageUser::class, 'getAllUsers']);
+    Route::get('/user/{id}', [ManageUser::class, 'showUser']);
+    Route::delete('user/{id}', [ManageUser::class, 'deleteUser']);
+
+    //featured category add
+    Route::apiResource('featured', FeaturedController::class)->except(['create', 'edit','show','update','destroy']);
 
 
 });
@@ -82,11 +96,44 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/faq', [FaqController::class, 'index']);
 
     //update user profile & password
+    Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/update-password', [UserController::class, 'updatePassword']);
 
+    //audio history
+    Route::get('/audio-history', [AudioTrackController::class, 'getAudioHistory']);
+    Route::post('/add-audio-history', [AudioTrackController::class, 'userAudioHistory']);
+    Route::get('/audio-count', [AudioTrackController::class, 'countAudio']);
+
     //subscription
     Route::post('create-checkout-session', [SubscriptionController::class, 'createCheckoutSession']);
+
+    //check is_subscribed_required
+    Route::get('is-subscribed-required', [AudioTrackController::class, 'isSubscribedRequired']);
+});
+
+// Route::middleware(['jwt.auth','restrict.audio.access'])->group(function () {
+//     Route::get('/storage/audio/{filename}', function ($filename) {
+//         $filePath = storage_path("app/public/audio/$filename");
+
+//         if (!file_exists($filePath)) {
+//             return response()->json(['message' => 'Audio not found.'], 404);
+//         }
+
+//         return response()->file($filePath);
+//     });
+// });
+
+Route::group(['middleware' => 'jwt.auth'], function () {
+    Route::get('/storage/audio/{filename}', function ($filename) {
+        $filePath = storage_path("app/public/audio/$filename");
+
+        if (!file_exists($filePath)) {
+            return response()->json(['message' => 'Audio not found.'], 404);
+        }
+
+        return response()->file($filePath);
+    });
 });
 
 //notification

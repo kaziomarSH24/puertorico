@@ -14,8 +14,36 @@ class Homecontroller extends Controller
     public function homeSection()
     {
         $featuredCategory = Category::where('is_featured', 1)
-            // ->select('id','title', 'artwork')
-            ->paginate(10);
+    ->with([
+        'audios:category_id,url',
+        'stories' => function ($query) {
+            $query->where('user_id', Auth::id());
+        }
+    ])
+    ->withCount('audios') // Total stories count
+    ->paginate(10);
+
+    $featuredCategory->transform(function ($category) {
+        $hasStory = $category->stories->isNotEmpty();
+        $totalDuration = $this->getCategoryTotalDuration($category->id);
+
+        $minutes = floor($totalDuration / 60);
+        $seconds = $totalDuration % 60;
+        $totalDurationText = "{$minutes}m {$seconds}s";
+
+        $totalStories = strtoupper($category->audios_count . ' ' . ($category->audios_count > 1 ? 'stories' : 'story') . ' - ' . $minutes . ' minutes ' . $seconds . ' seconds');
+
+        return [
+            'id' => $category->id,
+            'title' => $category->title,
+            'artwork' => $category->artwork,
+            'description' => $category->description,
+            'has_story' => $hasStory,
+            'duration' => $totalDurationText,
+            'stories' => $totalStories,
+        ];
+});
+
 
         // $topAudios = Audio::whereIn('category_id', $topCategory)
         //              ->orderBy('views', 'DESC')
@@ -25,12 +53,59 @@ class Homecontroller extends Controller
             $query->where('language', 'english')
                 ->orderBy('views', 'DESC');
         })
+            ->withCount('audios')
             ->paginate(10);
+        $englishAudios->transform(function ($category) {
+            $hasStory = $category->stories->isNotEmpty();
+            $totalDuration = $this->getCategoryTotalDuration($category->id, 'english');
+
+        $minutes = floor($totalDuration / 60);
+        $seconds = $totalDuration % 60;
+        $totalDurationText = "{$minutes}m {$seconds}s";
+
+        $totalStories = strtoupper($category->audios_count . ' ' . ($category->audios_count > 1 ? 'stories' : 'story') . ' - ' . $minutes . ' minutes ' . $seconds . ' seconds');
+
+        return [
+            'id' => $category->id,
+            'title' => $category->title,
+            'artwork' => $category->artwork,
+            'description' => $category->description,
+            'has_story' => $hasStory,
+            'total_duration' => $totalDurationText,
+            'total_stories' => $totalStories,
+        ];
+
+        });
+
+
+
+
         $spanishAudios = Category::whereHas('audios', function ($query) {
             $query->where('language', 'spanish')
                 ->orderBy('views', 'DESC');
         })
+            ->withCount('audios')
             ->paginate(10);
+        $spanishAudios->transform(function ($category) {
+            $hasStory = $category->stories->isNotEmpty();
+            $totalDuration = $this->getCategoryTotalDuration($category->id, 'spanish');
+            $minutes = floor($totalDuration / 60);
+        $seconds = $totalDuration % 60;
+        $totalDurationText = "{$minutes}m {$seconds}s";
+
+        $totalStories = strtoupper($category->audios_count . ' ' . ($category->audios_count > 1 ? 'stories' : 'story') . ' - ' . $minutes . ' minutes ' . $seconds . ' seconds');
+
+        return [
+            'id' => $category->id,
+            'title' => $category->title,
+            'artwork' => $category->artwork,
+            'description' => $category->description,
+            'has_story' => $hasStory,
+            'total_duration' => $totalDurationText,
+            'total_stories' => $totalStories,
+        ];
+        });
+
         return response()->json([
             'success' => true,
             'featured' => $featuredCategory,
@@ -113,10 +188,12 @@ class Homecontroller extends Controller
     }
 
     //Category audios total duration
-    private function getCategoryTotalDuration($categoryId)
+    private function getCategoryTotalDuration($categoryId, $language = null)
     {
         $audios = Audio::where('category_id', $categoryId)->get();
-
+        if ($language !== null) {
+            $audios = $audios->where('language', $language);
+        }
         $totalDuration = 0;
         $getID3 = new \getID3();
 

@@ -37,8 +37,7 @@ class NearbyAudioController extends Controller
             (6371 * acos(
                 cos(radians(?)) * cos(radians(lat)) * cos(radians(lng) - radians(?)) +
                 sin(radians(?)) * sin(radians(lat))
-            )) < 10
-        ", [$latitude, $longitude, $latitude])
+            )) < 1", [$latitude, $longitude, $latitude])
             ->groupBy('lat', 'lng')
             ->get();
 
@@ -149,3 +148,7 @@ class NearbyAudioController extends Controller
         ];
     }
 }
+
+
+
+

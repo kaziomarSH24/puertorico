@@ -7,6 +7,8 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class AudioSeeder extends Seeder
 {
@@ -17,51 +19,67 @@ class AudioSeeder extends Seeder
     {
         $faker = Faker::create();
 
+        // Get all image files from the public/img directory
+        $imageFiles = File::files(public_path('img'));
+
+        // Ensure the storage directory exists
+        Storage::makeDirectory('public/audio/image');
+
+        // Copy images to storage/app/public/audio/image
+        $imgPaths = [];
+        foreach ($imageFiles as $imageFile) {
+            $destinationPath = 'public/audio/image/' . $imageFile->getFilename();
+            Storage::put($destinationPath, File::get($imageFile));
+            $imgPaths[] = $destinationPath;
+        }
+
+        // Get all audio files from the public/audio directory
+        $audioFiles = File::files(public_path('audio'));
+
+        // Ensure the storage directory exists
+        Storage::makeDirectory('public/audio');
+
+        // Copy audio files to storage/app/public/audio
+        $audioPaths = [];
+        foreach ($audioFiles as $audioFile) {
+            $destinationPath = 'public/audio/' . $audioFile->getFilename();
+            Storage::put($destinationPath, File::get($audioFile));
+            $audioPaths[] = $destinationPath;
+        }
+
         $audios = [
             [
                 'category_id' => 1,
-                'url' => 'audio/JFwPfN797d33rKSl3u8BP1SQfiu66EHtXEFJoC8t.mp3',
-                'artwork' => 'audio/image/Uw7pSdxd0KAdYShUzn7qKQvp6bIy94LjX0Yeo9E.jpg',
                 'language' => 'spanish',
                 'lat' => 23.77449350,
                 'lng' => 90.41615670,
             ],
             [
                 'category_id' => 1,
-                'url' => 'audio/xUAxS9ImyjdYf3INuTQUxIPhl27GqAgrqxw7bqFa.mp3',
-                'artwork' => 'audio/image/RcCQU5U5uvGmsrsN8E6QyPVX0LhuASLqEiJ0e1ZK.jpg',
                 'language' => 'spanish',
                 'lat' => 23.77449350,
                 'lng' => 90.41615670,
             ],
             [
                 'category_id' => 2,
-                'url' => 'audio/OZLUgZ1eXPAvV6GGUTp4vZwhFATZx0pbU21GTvl7.mp3',
-                'artwork' => 'audio/image/pQ19CAX7rYlHoWY1zJGZOUNEL76WNUkojGSvA40.jpg',
                 'language' => 'spanish',
                 'lat' => 23.77449350,
                 'lng' => 90.41615670,
             ],
             [
                 'category_id' => 2,
-                'url' => 'audio/zgrq30oNSoXeqGze5BVzjTMk58UtUwElgZAcFgj.mp3',
-                'artwork' => 'audio/image/QbgYuywrfs2vGWXnoqwZVeBkYDz2hTcNWJ2PBk3.png',
                 'language' => 'spanish',
                 'lat' => 23.75883110,
                 'lng' => 90.42934430,
             ],
             [
                 'category_id' => 3,
-                'url' => 'audio/zJjIbOo9pyjIlwcgmBWaQ4FZMdVgApcSux0Oexfa.mp3',
-                'artwork' => 'audio/image/p4CURcmS1Zap5M1UOcy85r5XzCNWErclJcIv3.png',
                 'language' => 'english',
                 'lat' => 23.75883110,
                 'lng' => 90.42934430,
             ],
             [
                 'category_id' => 3,
-                'url' => 'audio/Rbg1T3vQgKmdBMgLEP8ZECD6SqLZM9aOMvNZjfCD.mp3',
-                'artwork' => 'audio/image/voUiNXe7LTPBAgZvFyj4oVUNqLaapWTrOP8Tqx6.png',
                 'language' => 'english',
                 'lat' => 23.75883110,
                 'lng' => 90.42934430,
@@ -69,12 +87,28 @@ class AudioSeeder extends Seeder
         ];
 
         foreach ($audios as $audio) {
+            // Ensure there are image files to select from
+            if (empty($imgPaths)) {
+                throw new \Exception('No image files found in public/img directory');
+            }
+
+            // Ensure there are audio files to select from
+            if (empty($audioPaths)) {
+                throw new \Exception('No audio files found in public/audio directory');
+            }
+
+            // Select a random image from the copied images
+            $randomImage = $imgPaths[array_rand($imgPaths)];
+
+            // Select a random audio file from the copied audio files
+            $randomAudio = $audioPaths[array_rand($audioPaths)];
+
             DB::table('audios')->insert([
                 'category_id' => $audio['category_id'],
                 'title' => $faker->sentence(3),
-                'url' => $audio['url'],
+                'url' => Storage::url($randomAudio),
                 'artist' => $faker->optional()->name,
-                'artwork' => $audio['artwork'],
+                'artwork' => Storage::url($randomImage),
                 'language' => $audio['language'],
                 'description' => $faker->paragraph(),
                 'views' => $faker->numberBetween(0, 500),

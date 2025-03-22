@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -35,41 +36,51 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'artwork' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'description' => 'nullable|string'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()
-            ], 400);
-        }
-
-        //has image file
-        $categoryImage = $request->file('artwork');
-        if($categoryImage){
-            $catImgPath = $categoryImage->store('category', 'public');
-        }
-
-        $category = new Category();
-        $category->title = $request->title;
-        // $category->slug = generateUniqueSlug($category, $request->title);
-        $category->artwork = $catImgPath;
-        $category->description = $request->description;
-
-        if($category->save()){
-            return response()->json([
-                'success' => true,
-                'message' => 'Category created successfully',
-                'category' => $category
+        try {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'artwork' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'description' => 'nullable|string'
             ]);
-        }else{
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 400);
+            }
+
+            //has image file
+            $categoryImage = $request->file('artwork');
+            if($categoryImage){
+                $catImgPath = $categoryImage->store('category', 'public');
+            }
+            // Log::info("Request: " . $request->all());
+            // Log::info("artwork: " . $request->artwork);
+            $category = new Category();
+            $category->title = $request->title;
+            // $category->slug = generateUniqueSlug($category, $request->title);
+            $category->artwork = $catImgPath;
+            $category->description = $request->description;
+
+            if($category->save()){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Category created successfully',
+                    'category' => $category
+                ]);
+            }else{
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category could not be created'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error("message: " .$e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Category could not be created'
+                'message' => 'Something went wrong!',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
@@ -106,17 +117,16 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'artwork' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'artwork' => 'sometimes|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()
+                'message' => $validator->errors()->first()
             ], 400);
         }
 
@@ -138,11 +148,11 @@ class CategoryController extends Controller
                 Storage::disk('public')->delete($oldImagePath);
             }
             $catImgPath = $categoryImage->store('category', 'public');
+            $categories->artwork = $catImgPath;
         }
 
         $categories->title = $request->title;
         // $categories->slug = generateUniqueSlug($categories, $request->title);
-        $categories->artwork = $catImgPath;
         $categories->description = $request->description;
 
         $categories->save();

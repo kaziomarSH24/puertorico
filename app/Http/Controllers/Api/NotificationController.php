@@ -12,7 +12,7 @@ class NotificationController extends Controller
     {
         // return "Hello";
         $user = auth()->user();
-        $notifications = $user->notifications()->latest()->get();
+        $notifications = $user->notifications()->latest()->paginate($request->per_page ?? 20);
 
         $notifications->transform(function ($notification) {
             //create_at format

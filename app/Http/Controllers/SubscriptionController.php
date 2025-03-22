@@ -190,9 +190,18 @@ class SubscriptionController extends Controller
             if ($subscription) {
                 $subscription->status = 'inactive';
                 $subscription->save();
-            }else{
-                $subscription = new Subscription();
             }
+                $subscription = new Subscription();
+                $subscription->user_id = $metadata['user_id'];
+                $subscription->plan_name = $metadata['plan_name'];
+                $subscription->price = $metadata['amount'];
+                $subscription->audio_limit = $metadata['audio_limit'];
+                $subscription->start_date = now();
+                $subscription->expires_at = $expires_at;
+                $subscription->payment_id = $session->payment_intent;
+                $subscription->status = 'active';
+                $subscription->save();
+
 
         }
 

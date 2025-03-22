@@ -29,7 +29,7 @@ class PricingPlanController extends Controller
                 'plan_name' => $plan->plan_name,
                 'price' => $plan->price,
                 'per_day' => round($per_day, 2),
-                'audio_limit' => $plan->audio_limit == -1 ? 'Unlimited' : $plan->audio_limit,
+                'audio_limit' => $plan->audio_limit
             ];
         });
 

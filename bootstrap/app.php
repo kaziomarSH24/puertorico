@@ -13,8 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'access.audio' => App\Http\Middleware\RestrictAudioAccess::class,
             'jwt.auth' => App\Http\Middleware\JWTAuthMiddleware::class,
             'check.admin' => App\Http\Middleware\CheckAdmin::class,
+            // 'check.subscription' => App\Http\Middleware\CheckSubscription::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

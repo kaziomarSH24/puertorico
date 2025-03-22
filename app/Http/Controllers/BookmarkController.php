@@ -16,7 +16,7 @@ class BookmarkController extends Controller
     {
         $user = Auth::user();
         $Bookmark = Bookmark::with(['audio' => function ($query) {
-            $query->select(['id', 'title', 'url','artist','artwork','category_id', 'views', 'language', 'is_favorite', 'is_bookmarked']);
+            $query->select(['id', 'title', 'url','artist','artwork','category_id', 'views', 'language']);
         }])
             ->where('user_id', $user->id)
             ->paginate($request->input('per_page', 10));

@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call(UserSeeder::class);
-        $this->call(CategorySeeder::class);
+        // $this->call(CategorySeeder::class);
         $this->call(PricingSeeder::class);
-        $this->call(AudioSeeder::class);
+        // $this->call(AudioSeeder::class);
     }
 }

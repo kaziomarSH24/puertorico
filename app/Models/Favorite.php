@@ -17,4 +17,10 @@ class Favorite extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    //is_favorite attribute
+    public function getIsFavoriteAttribute()
+    {
+        return true;
+    }
 }

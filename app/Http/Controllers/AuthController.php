@@ -377,14 +377,16 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'full_name'   => 'required|string|max:255',
             'email'       => 'required|email|max:255',
+            'avatar'      => 'nullable|image|mimes:jpeg,png,jpg',
             'google_id'   => 'nullable|string',
             'facebook_id' => 'nullable|string',
+            'device_token' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validator->errors(),
+                'errors'  => $validator->errors()->first(),
             ], 422);
         }
 
@@ -413,9 +415,16 @@ class AuthController extends Controller
             return $this->responseWithToken(JWTAuth::fromUser($existingUser), 'User login successfully.');
         }
 
+        //upload avatar
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $avatarPath = $avatar->store('uploads/avatars', 'public');
+        }
+
         $user = User::create([
             'name'        => $request->full_name,
             'email'       => $request->email,
+            'avatar'      => $avatarPath ?? null,
             'password'    => Hash::make($request->email . '@' . $request->goole_id ?? $request->facebook_id),
             'google_id'   => $request->google_id,
             'facebook_id' => $request->facebook_id,

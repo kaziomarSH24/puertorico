@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Audio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -67,6 +68,7 @@ class AudioController extends Controller
      */
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
@@ -82,7 +84,7 @@ class AudioController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()
+                'message' => $validator->errors()->first()
             ], 400);
         }
 
@@ -161,22 +163,25 @@ class AudioController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // return $request->all();
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
-            'url' => 'nullable|file',
+            'url' => 'sometimes|file',
             'artist' => 'nullable|string|max:255',
-            'artwork' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'artwork' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'language' => 'required|in:english,spanish',
             'description' => 'nullable|string',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric'
+            'lat' => 'sometimes|numeric',
+            'lng' => 'sometimes|numeric'
         ]);
+
+        Log::info('Audio update request: '.json_encode($request->all()));
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()
+                'message' => $validator->errors()->first()
             ], 400);
         }
 
