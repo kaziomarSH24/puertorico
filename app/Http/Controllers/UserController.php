@@ -49,7 +49,7 @@ class UserController extends Controller
             'avatar.required' => 'The avatar field is required',
             'avatar.image' => 'The avatar must be an image',
             'avatar.mimes' => 'The avatar must be a file of type: jpeg, png, jpg, gif, svg',
-            'avatar.max' => 'The avatar must less than 2MB',
+            'avatar.max' => 'The avatar must be less than 2MB',
         ]);
 
         if ($validator->fails()) {

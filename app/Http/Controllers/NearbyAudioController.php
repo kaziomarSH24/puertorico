@@ -50,11 +50,11 @@ class NearbyAudioController extends Controller
             return $data;
         }
         $newSongs = $data['new_songs'] ?? [];
-        Log::info(count($newSongs) > 0 ? 'Notification sent' : 'No new songs to notify++');
+        Log::info(count($newSongs) > 0 ? 'Notification sent' : 'No new audio to notify');
         Log::info($nearbyAudios);
         return response()->json([
             'success' => true,
-            'message' => count($newSongs) > 0 ? 'Notification sent' : 'No new songs to notify',
+            'message' => count($newSongs) > 0 ? 'Notification sent' : 'No new new to notify',
             'data'    => $nearbyAudios,
         ]);
     }
@@ -115,7 +115,7 @@ class NearbyAudioController extends Controller
         // return $nearbySongs;
 
         if ($nearbySongs->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'No nearby songs foundsss'], 404);
+            return response()->json(['success' => false, 'message' => 'No nearby songs found'], 404);
         }
 
        if($language === null){
@@ -139,7 +139,7 @@ class NearbyAudioController extends Controller
 
         if (count($newSongs) > 0) {
             // Send a single notification with the count of new songs
-            $user->notify(new NearbySongNotification(count($newSongs) . ' new songs found', $user->device_token));
+            $user->notify(new NearbySongNotification(count($newSongs) . ' new audio' . (count($newSongs) > 1 ? 's' : '') . ' found', $user->device_token));
         }
        }
         return[

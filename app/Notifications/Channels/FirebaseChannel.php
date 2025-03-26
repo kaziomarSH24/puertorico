@@ -28,7 +28,7 @@ class FirebaseChannel
         //     throw new \Exception('Notification is missing toFirebase method.');
         // }
         $fcmData = $notification->toFirebase($notifiable);
-        \Log::info("User Device Token: " . $fcmData['token']);
+        // \Log::info("User Device Token: " . $fcmData['token']);
         // if(!$fcmData['token']){
         //     return response()->json(['message' => 'User device token not found.'], 400);
         // }

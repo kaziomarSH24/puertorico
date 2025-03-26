@@ -37,7 +37,7 @@ class NearbySongNotification extends Notification
     {
         return [
             'token' => $this->deviceToken,
-            'title' => 'Nearby Music',
+            'title' => 'Nearby Audio',
             'body'  => $this->message,
         ];
     }

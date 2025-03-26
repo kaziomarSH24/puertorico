@@ -41,6 +41,7 @@ class AudioTrackController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
+                'is_subscription_required' => $this->isSubscribedRequired()->original['is_subscription_required'],
                 'message' => 'Audio history added successfully'
             ], 200);
 
