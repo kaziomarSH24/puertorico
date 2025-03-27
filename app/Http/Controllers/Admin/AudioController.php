@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+// use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AudioController extends Controller
 {
@@ -17,6 +19,8 @@ class AudioController extends Controller
      */
     public function index(Request $request)
     {
+
+        // return $response;
         $query = Audio::query()->with(['category' => function ($query) {
             $query->select('id', 'title', 'artwork');
         }]);
@@ -41,6 +45,11 @@ class AudioController extends Controller
 
         $audios = $query->paginate($request->input('per_page', 10));
 
+        $audios->transform(function ($audio) {
+            $location = $this->findLocation($audio->lat, $audio->lng);
+            $audio->location = $location;
+            return $audio;
+        });
 
         if ($audios->isEmpty()) {
             return response()->json([
@@ -138,6 +147,9 @@ class AudioController extends Controller
             $audio->views = $audio->views + 1;
             $audio->save();
         }
+
+        $location = $this->findLocation($audio->lat, $audio->lng);
+        $audio->location = $location;
         // $audio->save();
         $audioFilePath = getStorageFilePath($audio->url);
         $duration = getAudioDuration($audioFilePath);
@@ -264,5 +276,24 @@ class AudioController extends Controller
             'success' => true,
             'message' => 'Audio deleted successfully'
         ]);
+    }
+
+    private function findLocation($lat, $lng){
+        $response = Http::withHeaders([
+            'User-Agent' => 'PuertoRico (contact@puertorico.com)'
+        ])->get("https://nominatim.openstreetmap.org/reverse?lat={$lat}&lon={$lng}&format=json&accept-language=en")->json();
+
+
+
+        return [
+            'address' => $response['display_name'],
+            'rod' => $response['address']['road'],
+            'city' => $response['address']['city'],
+            'state' => $response['address']['state'],
+            'suburb'=> $response['address']['suburb'],
+            'country' => $response['address']['country'],
+            'country_code' => $response['address']['country_code'],
+            'postal_code' => $response['address']['postcode']
+        ];
     }
 }
