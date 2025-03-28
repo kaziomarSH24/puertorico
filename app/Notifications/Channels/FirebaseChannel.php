@@ -19,7 +19,7 @@ class FirebaseChannel
 
         try{
             $serviceAccountPath = storage_path('puertorico-push-notificaton-firebase-adminsdk-fbsvc-f0bd2f48d4.json');
-            \Log::info('serviceAccountPath: ' . $serviceAccountPath);
+            // \Log::info('serviceAccountPath: ' . $serviceAccountPath);
             $messaging = (new Factory)
             ->withServiceAccount($serviceAccountPath)
             ->createMessaging();

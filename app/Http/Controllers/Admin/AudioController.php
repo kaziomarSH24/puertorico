@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+// use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AudioController extends Controller
 {
@@ -17,6 +19,8 @@ class AudioController extends Controller
      */
     public function index(Request $request)
     {
+
+        // return $response;
         $query = Audio::query()->with(['category' => function ($query) {
             $query->select('id', 'title', 'artwork');
         }]);
@@ -42,12 +46,19 @@ class AudioController extends Controller
         $audios = $query->paginate($request->input('per_page', 10));
 
 
+
         if ($audios->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Audios not found'
             ], 404);
         }
+
+        $audios->transform(function ($audio) {
+            $location = $this->findLocation($audio->lat, $audio->lng);
+            $audio->location = $location;
+            return $audio;
+        });
 
         return response()->json([
             'success' => true,
@@ -139,6 +150,9 @@ class AudioController extends Controller
             $audio->save();
         }
         // $audio->save();
+        $location = $this->findLocation($audio->lat, $audio->lng);
+        $audio->location = $location;
+
         $audioFilePath = getStorageFilePath($audio->url);
         $duration = getAudioDuration($audioFilePath);
         // return $duration;
@@ -264,5 +278,24 @@ class AudioController extends Controller
             'success' => true,
             'message' => 'Audio deleted successfully'
         ]);
+    }
+
+    private function findLocation($lat, $lng){
+        $response = Http::withHeaders([
+            'User-Agent' => 'PuertoRico (contact@puertorico.com)'
+        ])->get("https://nominatim.openstreetmap.org/reverse?lat={$lat}&lon={$lng}&format=json&accept-language=en")->json();
+
+
+
+        return [
+            'address' => $response['display_name'] ?? null,
+            'road' => $response['address']['road'] ?? null,
+            'city' => $response['address']['city'] ?? null,
+            'state' => $response['address']['state'] ?? null,
+            'suburb' => $response['address']['suburb'] ?? null,
+            'country' => $response['address']['country'] ?? null,
+            'country_code' => $response['address']['country_code'] ?? null,
+            'postal_code' => $response['address']['postcode'] ?? null
+        ];
     }
 }

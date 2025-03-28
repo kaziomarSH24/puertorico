@@ -139,7 +139,7 @@ class NearbyAudioController extends Controller
 
         if (count($newSongs) > 0) {
             // Send a single notification with the count of new songs
-            $user->notify(new NearbySongNotification(count($newSongs) . ' new songs found', $user->device_token));
+            $user->notify(new NearbySongNotification(count($newSongs) . ' new audio' . (count($newSongs) > 1 ? 's' : '') . ' found', $user->device_token));
         }
        }
         return[
