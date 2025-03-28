@@ -54,11 +54,11 @@ class AudioController extends Controller
             ], 404);
         }
 
-        $audios->transform(function ($audio) {
-            $location = $this->findLocation($audio->lat, $audio->lng);
-            $audio->location = $location;
-            return $audio;
-        });
+        // $audios->transform(function ($audio) {
+        //     $location = $this->findLocation($audio->lat, $audio->lng);
+        //     $audio->location = $location;
+        //     return $audio;
+        // });
 
         return response()->json([
             'success' => true,
@@ -149,6 +149,9 @@ class AudioController extends Controller
             $audio->views = $audio->views + 1;
             $audio->save();
         }
+
+        // $location = $this->findLocation($audio->lat, $audio->lng);
+        // $audio->location = $location;
         // $audio->save();
         $location = $this->findLocation($audio->lat, $audio->lng);
         $audio->location = $location;
@@ -280,22 +283,22 @@ class AudioController extends Controller
         ]);
     }
 
-    private function findLocation($lat, $lng){
-        $response = Http::withHeaders([
-            'User-Agent' => 'PuertoRico (contact@puertorico.com)'
-        ])->get("https://nominatim.openstreetmap.org/reverse?lat={$lat}&lon={$lng}&format=json&accept-language=en")->json();
+    // private function findLocation($lat, $lng){
+    //     $response = Http::withHeaders([
+    //         'User-Agent' => 'PuertoRico (contact@puertorico.com)'
+    //     ])->get("https://nominatim.openstreetmap.org/reverse?lat={$lat}&lon={$lng}&format=json&accept-language=en")->json();
 
 
 
-        return [
-            'address' => $response['display_name'] ?? null,
-            'road' => $response['address']['road'] ?? null,
-            'city' => $response['address']['city'] ?? null,
-            'state' => $response['address']['state'] ?? null,
-            'suburb' => $response['address']['suburb'] ?? null,
-            'country' => $response['address']['country'] ?? null,
-            'country_code' => $response['address']['country_code'] ?? null,
-            'postal_code' => $response['address']['postcode'] ?? null
-        ];
-    }
+    //     return [
+    //         'address' => $response['display_name'],
+    //         'road' => $response['address']['road'] ?? null,
+    //         'city' => $response['address']['city'] ?? null,
+    //         'state' => $response['address']['state'],
+    //         'suburb'=> $response['address']['suburb'],
+    //         'country' => $response['address']['country'],
+    //         'country_code' => $response['address']['country_code'],
+    //         'postal_code' => $response['address']['postcode']
+    //     ];
+    // }
 }
