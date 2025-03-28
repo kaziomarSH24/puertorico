@@ -153,8 +153,6 @@ class AudioController extends Controller
         // $location = $this->findLocation($audio->lat, $audio->lng);
         // $audio->location = $location;
         // $audio->save();
-        $location = $this->findLocation($audio->lat, $audio->lng);
-        $audio->location = $location;
 
         $audioFilePath = getStorageFilePath($audio->url);
         $duration = getAudioDuration($audioFilePath);
