@@ -38,25 +38,32 @@ class UserController extends Controller
        try{
         $user = Auth::user();
         $validator = Validator::make($request->all(), [
-            'fullname' => 'required|string|max:255',
-            'phone' => 'required|string|max:255',
+            'fullname' => 'required|string|max:30|min:6',
+            // 'phone' => 'required|string|max:14|min:11',
+            'phone' => ['required', 'regex:/^[0-9\-]{11,14}$/'],
             // 'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'avatar' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg',
         ],
         [
-            'fullname.required' => 'The name field is required',
-            'phone.required' => 'The phone field is required',
-            'avatar.required' => 'The avatar field is required',
-            'avatar.image' => 'The avatar must be an image',
-            'avatar.mimes' => 'The avatar must be a file of type: jpeg, png, jpg, gif, svg',
-            'avatar.max' => 'The avatar must be less than 2MB',
-        ]);
+            'fullname.required' => 'The Full Name field is required',
+            'fullname.min' => 'The Full Name field must be at least 6 characters',
+            'fullname.max' => 'The Full Name field must be less than 30 characters',
+            'phone.required' => 'The Phone field is required',
+            'phone.max' => 'The Phone field must be less than 14 characters',
+            'phone.min' => 'The Phone field must be at least 11 characters',
+            'phone.regex' => 'The Phone field must be a valid phone number.',
+            // 'avatar.required' => 'The avatar field is required',
+            // 'avatar.image' => 'The avatar must be an image',
+            // 'avatar.mimes' => 'The avatar must be a file of type: jpeg, png, jpg, gif, svg',
+            // 'avatar.max' => 'The avatar must be less than 2MB',
+        ]
+    );
 
         if ($validator->fails()) {
             Log::error('Error: '.$validator->errors());
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()
             ], 400);
         }
 

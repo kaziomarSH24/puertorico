@@ -26,8 +26,9 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|string',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed|min:8',
+           'password' => 'required|string|min:8|regex:/[A-Z]/|regex:/[0-9]/|confirmed',
             'device_token' => 'nullable|string',
+            'checked' => 'required|accepted',
         ]);
 
         if ($validator->fails()) {
@@ -68,9 +69,10 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|',
-            'password' => 'required|string|min:8',
-            // 'device_token' => 'nullable|string',
+            'password' => 'required|string|min:8|regex:/[A-Z]/|regex:/[0-9]/',
+
         ]);
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -221,7 +223,7 @@ class AuthController extends Controller
             $user = Auth::user();
             if ($user) {
                 $validator = Validator::make($request->all(), [
-                    'password' => 'required|string|confirmed|min:6',
+                   'password' => 'required|string|min:8|regex:/[A-Z]/|regex:/[0-9]/',
                 ]);
                 if ($validator->fails()) {
                     return response()->json($validator->errors());

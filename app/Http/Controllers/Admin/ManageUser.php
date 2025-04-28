@@ -12,10 +12,13 @@ class ManageUser extends Controller
     public function getAllUsers(Request $request)
     {
         $searchKey = $request->search_key;
-        $users = User::where('name', 'like', '%' . $searchKey . '%')
-            ->orWhere('email', 'like', '%' . $searchKey . '%')
-            ->orWhere('phone', 'like', '%' . $searchKey . '%')
-            ->paginate($request->per_page);
+        $users = User::where('role', 'user') // Apply the role condition first
+        ->where(function ($query) use ($searchKey) {  // Group the OR conditions
+            $query->where('name', 'like', '%' . $searchKey . '%')
+                ->orWhere('email', 'like', '%' . $searchKey . '%')
+                ->orWhere('phone', 'like', '%' . $searchKey . '%');
+        })
+        ->paginate($request->per_page);
         if ($users->isEmpty()) {
             return response()->json([
                 'success' => false,

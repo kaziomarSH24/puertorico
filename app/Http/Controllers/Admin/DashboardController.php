@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         try {
             $year = $request->input('year', date('Y'));
-            $usersCount = User::count();
+            $usersCount = User::where('role','user')->count();
             $totalListenAudio = Audio::sum('views');
             $totalEarning = Subscription::sum('price');
             $dashboardData = User::selectRaw('
